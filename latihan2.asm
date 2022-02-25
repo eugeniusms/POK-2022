@@ -7,7 +7,7 @@ menu: .asciiz "Selamat datang di Kantin Pokpok Tercinta :D\n1. Nasi Ayam Goreng 
 menu1: .asciiz "Anda memesan: Nasi Ayam Goreng"
 menu2: .asciiz "Anda memesan: Nasi Udang Goreng"
 menu3: .asciiz "Anda memesan: Nasi Ikan Goreng" 
-
+menuInvalid: .asciiz "Masukkan Anda tidak valid\n\n" # Keluaran input tidak valid
 
 .text 
 .globl main
@@ -28,8 +28,15 @@ main:
     beq $t0, $t2, get2 # jika input == 2 pergi ke get2
     beq $t0, $t3, get3 # jika input == 3 pergi ke get3
     
-    li $v0, 10 # syscall 10 = exit program
+    # Ketika input tidak memenuhi kondisi ketiga beq di atas, maka
+    # program terus berlanjut (tidak akan jump exit di dalam label get)
+    # lanjutannya ke sini (cetak menuInvalid)
+    
+    li $v0, 4 # syscall 4 = print string in register a0
+    la $a0, menuInvalid # register a0 = print menuInvalid
     syscall # execute
+    
+    j main # saat masih masuk ke line ini berarti program tidak valid sehingga di loop ke main lagi
     
 get1:
     li $v0, 4 # syscall 4 = print string in register a0

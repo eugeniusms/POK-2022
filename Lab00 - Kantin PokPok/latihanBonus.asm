@@ -1,3 +1,6 @@
+# nama : eugenius mario situmorang
+# npm : 2106750484
+# kelas : pok b
 .data
 # Menginisiasikan isi selamat datang dan menu dalam variabel menu, menu1, menu2, menu3
 menu: .asciiz "Selamat datang di Kantin Pokpok Tercinta :D\n1. Nasi Ayam Goreng  (Rp 25)\n2. Nasi Udang Goreng (Rp 30)\n3. Nasi Ikan Goreng  (Rp 15)\n(Note: Harga dalam ribuan)\nMasukkan jumlah pesanan: "
