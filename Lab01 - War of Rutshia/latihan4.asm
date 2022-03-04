@@ -1,3 +1,6 @@
+# nama : eugenius mario situmorang
+# npm : 2106750484
+# kelas : pok b
 .data
 # Inisiasi semua format output display
 infantri: .asciiz "Masukkan jumlah infantri: "

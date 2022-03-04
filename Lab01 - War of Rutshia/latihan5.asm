@@ -1,9 +1,12 @@
+# nama : eugenius mario situmorang
+# npm : 2106750484
+# kelas : pok b
 .data
 # Inisiasi semua format output display
 infantri: .asciiz "Masukkan jumlah infantri: "
 tank: .asciiz "Masukkan jumlah tank: "
 pesawat: .asciiz "Masukkan jumlah pesawat tempur: "
-output: .asciiz "Total biaya yang dikeluarkan adalah $"
+output: .asciiz "\nTotal biaya yang dikeluarkan adalah $"
 
 .text 
 .globl main
