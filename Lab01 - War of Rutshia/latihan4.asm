@@ -108,6 +108,8 @@ hasil:
     la $a0, isi3 # register a0 = isi3
     syscall # execute
     
+    j exit # exit program
+    
 exit:
     li $v0, 10 # syscall 10 = exit program
     syscall # execute
