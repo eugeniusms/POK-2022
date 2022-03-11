@@ -1,19 +1,17 @@
+# nama : eugenius mario situmorang
+# npm : 2106750484
+# kelas : pok b
 .data
 # Inisiasi tampilan layar
 input: .asciiz "Masukkan Input 10 digit:"
-spasi: .asciiz "-\n"
 # Inisiasi array yang akan digunakan menampung digit
 array: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-arrayCopy9Akhir: .word 0, 0, 0, 0, 0, 0, 0, 0, 0
-arrayCopy9Awal: .word 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 .text 
 .globl main
 main: 
       la $t0, array # Mengisiasi input array ke $t0
-      la $t5, arrayCopy9Awal #  Menginisiasi array 9awal
-      la $t6, arrayCopy9Akhir # Menginisiasi array 9akhir
-      
+ 
       li $v0, 4 # syscall 4 = print string in register a0
       la $a0, input # register a0 = print isi input
       syscall # execute
@@ -24,9 +22,7 @@ main:
       add $t1, $v0, $zero # t1 digunakan untuk menyimpan masukan
       addi $t2, $zero, 0 # t2 digunakan sebagai counter
       
-      addi $t7, $zero, 0 # t7 digunakan sebagai counter array terpotong
-      
-      j input_loop
+      j input_loop # memulai pengambilan input
       
 input_loop: 
       div $t1, $t1, 10 # membagi masukan dengan 10
@@ -37,62 +33,68 @@ input_loop:
       addi $t0, $t0, 4 # memindahkan pointer ke indeks selanjutnya
       addi $t2, $t2, 1 # counting loop
       bne $t2, 10, input_loop # selama counter belum sampai 10 maka diloop lagi
-	
-operateArrayCopy:
-     # load array
+      
+      subi $t0, $t0, 40 # set pointer ke 0 lagi 
+      
+      j output # memulai operasi dan mencetak output
+      
+output:
+     # keterangan penyimpanan register
+     # -> s6 untuk index before
+     # -> s7 untuk index after
+      
+     # load index before
+     addi $t0, $t0, 4 # menambah indeks pointer ke indeks setelahnya
+     lb $a0, 0 ($t0) # mengambil isi dari array
+     addi $s6, $a0, 0 # menyimpan a0 sementara
+    
+     # load index after
      subi $t0, $t0, 4 # mengurangi indeks pointer ke indeks sebelumnya
-     lb $s0, 0 ($t0) # mengambil isi dari array
+     lb $a0, 0 ($t0) # mengambil isi array
+     addi $s7, $a0, 0 # menyimpan a0 sementara
      
-     # arrayAwal
-     # saat counter 10 jangan masukkan isi arraynya
-     bne $t2, 10, arrayAwal
-     
-     # arrayAkhir
-     # saat counter 0 jangan masukkan isi arraynya
-     bne $t2, 0, arrayAkhir
-     
-     subi $t2, $t2, 1 # mengurangi counter
-     
-     subi $t2, $t2, 1 # mengurangi counter
-     bne $t2, 0, operateArrayCopy # loop lagi sampai nol
-     j loopPengurangan
-     
-arrayAwal:
-     sb $s0, 0 ($t5) # memasukkan isi a0 ke t5
-     addi $t5, $t5, 4 # memindahkan pointer ke indeks selanjutnya
+     # set ulang pointer
+     addi $t0, $t0, 4
+    
+     # mendapat selisih -> nilai absolute pengurangan a > b -> (a - b) || a < b -> (b - a)
+     # cek s7 > s6
+     slt $s4, $s6, $s7
+     # if true s4 = 1
+     beq $s4, 1, kurangiA
+     # if false s4 = 0
+     beq $s4, 0, kurangiB
 
-arrayAkhir:
-     sb $s0, 0 ($t6) # memasukkan isi a0 ke t6
-     addi $t6, $t6, 4 # memindahkan pointer ke indeks selanjutnya
+kurangiA:
+     # agar hasil kurang tetap positif (absolut)
+     # hasil kurang
+     sub $s5, $s7, $s6
+     addi $s0, $s0, 1 # menambah counter
      
-loopPengurangan:
-     bne $t7, 0, pointerAdder
-     lb $a0, 0 ($t6) # mengambil data arrayAkhir pointer ke s0
-     lb $a1, 0 ($t5) # mengambil data arrayAwal pointer ke s1
-     
-     sub $t3, $a0, $a1 # mengurangi data indeks pointer arrayAkhir - arrayAwal
-     
-     # mencetak ke layar hasil dari pengurangannya
+     # cetak
      li $v0, 1 # print integer
-     la $a0, ($t3) # mengambil data hasil pengurangan
+     la $a0, ($s5) # load integer
      syscall # execute
      
-     # CHECK : membatasi print
-     li $v0, 4
-     la $a0, spasi
-     syscall
+     bne $s0, 9, output # loop lagi sampai nol
      
-     subi $t7, $t7, 1 # mengurangi counter
-     bne $t7, 0, loopPengurangan # ulangi sampai data habis
+     j exit # saat array sudah habis (counter ke 0)
      
-     j exit
+kurangiB:
+     # agar hasil kurang tetap positif (absolut)
+     # hasil kurang
+     sub $s5, $s6, $s7
+     addi $s0, $s0, 1 # menambah counter
      
-pointerAdder:
-     addi $t5, $t5, 4 # memindahkan pointer ke indeks selanjutnya
-     addi $t6, $t6, 4 # memindahkan pointer ke indeks selanjutnya
+     # cetak
+     li $v0, 1 # print integer
+     la $a0, ($s5) # load integer
+     syscall # execute
      
+     bne $s0, 9, output # loop lagi sampai nol
+     
+     j exit # saat array sudah habis (counter ke 0)
+
 exit:
-    li $v0, 10 # exit program
-    syscall # execute
+     li $v0, 10 # exit program
+     syscall # execute
       
-     
