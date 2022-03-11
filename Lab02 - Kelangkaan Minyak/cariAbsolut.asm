@@ -35,6 +35,9 @@ input_loop:
       j output
       
 output:
+     # s6 untuk index before
+     # s7 untuk index after
+      
      addi $t0, $t0, 4 # mengurangi indeks pointer ke indeks sebelumnya
      li $v0, 1 # print integer
      lb $a0, 0 ($t0) # mengambil isi dari array
@@ -56,12 +59,27 @@ output:
      la $a0, spasi # register a0 = print isi input
      syscall # execute
      
-     
+     # cek s7 > s6
+     slt $s4, $s6, $s7
+     # if true s4 = 1
+     beq $s4, 1, kurangiA
+     beq $s4, 0, kurangiB
+
+kurangiA:
+     # agar hasil kurang tetap positif (absolut)
+     sub $s5, $s7, $s6
      addi $s0, $s0, 1 # menambah counter
      bne $s0, 9, output # loop lagi sampai nol
      j exit
-          
+     
+kurangiB:
+     # hasil kurang
+     sub $s5, $s6, $s7
+     addi $s0, $s0, 1 # menambah counter
+     bne $s0, 9, output # loop lagi sampai nol
+     j exit     
+
 exit:
-    li $v0, 10 # exit program
-    syscall # execute
+     li $v0, 10 # exit program
+     syscall # execute
       

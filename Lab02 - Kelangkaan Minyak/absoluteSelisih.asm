@@ -31,19 +31,19 @@ input_loop:
       addi $t2, $t2, 1 # counting loop
       bne $t2, 10, input_loop # selama counter belum sampai 10 maka diloop lagi
       
-      subi $t0, $t0, 44 # set pointer ke 0 lagi 
+      subi $t0, $t0, 40 # set pointer ke 0 lagi 
       j output
       
 output:
      addi $t0, $t0, 4 # mengurangi indeks pointer ke indeks sebelumnya
      li $v0, 1 # print integer
-     lb $a0, 0 ($t0) # mengambil isi dari array
+     lb $s0, 0 ($t0) # mengambil isi dari array
      syscall # execute
     
      # selanjutnya
      subi $t0, $t0, 4
      li $v0, 1 
-     lb $a0, 0 ($t0)
+     lb $s1, 0 ($t0)
      syscall
      
      # set ulang pointer
@@ -54,6 +54,16 @@ output:
      la $a0, spasi # register a0 = print isi input
      syscall # execute
      
+     # kurangi
+     sub $s2, $s0, $s1
+     li $v0, 1
+     la $a0, ($s2)
+     syscall
+     
+     # formatting
+     li $v0, 4 # syscall 4 = print string in register a0
+     la $a0, spasi # register a0 = print isi input
+     syscall # execute
      
      addi $s0, $s0, 1 # menambah counter
      bne $s0, 10, output # loop lagi sampai nol
