@@ -3,9 +3,9 @@
 input: .asciiz "Masukkan Input 10 digit:"
 spasi: .asciiz "-\n"
 # Inisiasi array yang akan digunakan menampung digit
-array: .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-arrayCopy9Akhir: .word 0, 0, 0, 0, 0, 0, 0, 0, 0
-arrayCopy9Awal: .word 0, 0, 0, 0, 0, 0, 0, 0, 0
+array: .data 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+arrayCopy9Akhir: .data 0, 0, 0, 0, 0, 0, 0, 0, 0
+arrayCopy9Awal: .data 0, 0, 0, 0, 0, 0, 0, 0,
 
 .text 
 .globl main
@@ -23,9 +23,6 @@ main:
       
       add $t1, $v0, $zero # t1 digunakan untuk menyimpan masukan
       addi $t2, $zero, 0 # t2 digunakan sebagai counter
-      
-      addi $t7, $zero, 0 # t7 digunakan sebagai counter array terpotong
-      
       j input_loop
       
 input_loop: 
@@ -41,7 +38,7 @@ input_loop:
 operateArrayCopy:
      # load array
      subi $t0, $t0, 4 # mengurangi indeks pointer ke indeks sebelumnya
-     lb $s0, 0 ($t0) # mengambil isi dari array
+     lb $a0, 0 ($t0) # mengambil isi dari array
      
      # arrayAwal
      # saat counter 10 jangan masukkan isi arraynya
@@ -55,19 +52,31 @@ operateArrayCopy:
      
      subi $t2, $t2, 1 # mengurangi counter
      bne $t2, 0, operateArrayCopy # loop lagi sampai nol
-     j loopPengurangan
+     j proses
      
 arrayAwal:
-     sb $s0, 0 ($t5) # memasukkan isi a0 ke t5
+     sb $a0, 0 ($t5) # memasukkan isi a0 ke t5
      addi $t5, $t5, 4 # memindahkan pointer ke indeks selanjutnya
 
 arrayAkhir:
-     sb $s0, 0 ($t6) # memasukkan isi a0 ke t6
+     sb $a0, 0 ($t6) # memasukkan isi a0 ke t6
      addi $t6, $t6, 4 # memindahkan pointer ke indeks selanjutnya
      
+proses:
+     # memulai pengurangan arrayAkhir - arrayAwal sesuai indeks dari belakang
+     # menyetel pointer ke paling belakang 0 = isi ke 1, maka 4*8 = 32 (isi ke 9) + 4 agar perulangan lancar
+     addi $t6, $t6, 36 # mendapat pointer terakhir arrayAkhir
+     addi $t5, $t5, 36 # mendapat pointer terakhir arrayAwal
+     
+     # inisiasi counter
+     addi $t7, $zero, 9
+     
+     j loopPengurangan
+     
 loopPengurangan:
-     bne $t7, 0, pointerAdder
+     subi $t6, $t6, 4 # mengurangi pointer 
      lb $a0, 0 ($t6) # mengambil data arrayAkhir pointer ke s0
+     subi $t5, $t5, 4 # mengurangi pointer
      lb $a1, 0 ($t5) # mengambil data arrayAwal pointer ke s1
      
      sub $t3, $a0, $a1 # mengurangi data indeks pointer arrayAkhir - arrayAwal
@@ -86,10 +95,6 @@ loopPengurangan:
      bne $t7, 0, loopPengurangan # ulangi sampai data habis
      
      j exit
-     
-pointerAdder:
-     addi $t5, $t5, 4 # memindahkan pointer ke indeks selanjutnya
-     addi $t6, $t6, 4 # memindahkan pointer ke indeks selanjutnya
      
 exit:
     li $v0, 10 # exit program
